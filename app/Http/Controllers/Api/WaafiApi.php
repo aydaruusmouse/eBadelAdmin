@@ -99,7 +99,7 @@ class WaafiApi extends Controller
                 'phoneNumber' => 'required|string',
                 'amount' => 'required|numeric|min:0',
             ]);
-
+            
             // User amount and phone number.
             $phoneNumber = $validatedData['phoneNumber'];
             $amount = $validatedData['amount'];
@@ -160,17 +160,24 @@ class WaafiApi extends Controller
     public function newPayment($phoneNumber, $amount, $paymentStatus, $apiResponseMessage)
 {
     try {
+        // echo $phoneNumber;
+        // echo $amount;
         // Start a database transaction
         DB::beginTransaction();
-
+        // $validatedData['transaction_id'] = Str::uuid();
+        // $validatedData['reference_id'] = Str::uuid();
         // Create a new transaction record
 $transaction = Transaction::create([
     'sender' => 'aidarous mouse',
     'recipient' => 'aamin yousuf',
     'recipient_phone' => $phoneNumber,
+    'amount' => $amount,
+    'paymentStatus' => $paymentStatus,
+    'apiResponseMessage' => $apiResponseMessage,
     'date' => now()->toDateString(),
     'time' => now()->toTimeString(),
     'reference_id' => Str::uuid(), // Use Str::uuid() to generate a UUID for 'transaction_id'
+    'transaction_id' => Str::uuid(),
 ]);
 
 

@@ -19,6 +19,9 @@ class CreateTransactionTable extends Migration
                 $table->timestamps();
                 $table->string('sender');
                 $table->string('recipient');
+                $table->string('amount');
+                $table->string('paymentStatus');
+                $table->string('apiResponseMessage');
                 $table->string('recipient_phone');
                 $table->date('date');
                 $table->time('time');
