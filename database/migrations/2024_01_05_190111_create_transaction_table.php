@@ -17,6 +17,8 @@ class CreateTransactionTable extends Migration
             Schema::create('transaction', function (Blueprint $table) {
                 $table->id();
                 $table->timestamps();
+                $table->unsignedBigInteger('user_id'); // Foreign key
+                $table->foreign('user_id')->references('id')->on('users');
                 $table->string('sender');
                 $table->string('recipient');
                 $table->string('amount');
@@ -26,7 +28,7 @@ class CreateTransactionTable extends Migration
                 $table->date('date');
                 $table->time('time');
                 $table->uuid('reference_id');
-                $table->uuid('transaction_id')->primary(); 
+                $table->uuid('transaction_id'); 
             });
         }
     }

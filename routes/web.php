@@ -13,12 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-Route::get('/Aido', function () {
-    return 'Hello, this is your new route!';
-});
 
 // Route::post('zaad_payment', [\App\Http\Controllers\Api\ZaadApi::class, 'payWithZaad']);
 

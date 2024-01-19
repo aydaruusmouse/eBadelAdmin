@@ -56,5 +56,41 @@ Route::post('edahabcredit', [\App\Http\Controllers\Api\eDahab::class, 'CreditMon
 // Route::post("zaad", [\App\Http\Controllers\WaafiController::class, 'handleWaafiRequest']);
 
 // route transection controller
-Route::post('transections', [\App\Http\Controllers\Api\TransectionsController::class, 'store']);
-Route::get('transections', [\App\Http\Controllers\Api\TransectionsController::class, 'index']);
+// Route::post('transections', [\App\Http\Controllers\Api\TransectionsController::class, 'store']);
+// Route::get('transections', [\App\Http\Controllers\Api\TransectionsController::class, 'index']);
+
+
+// Apply auth middleware to routes that require authentication
+Route::middleware('auth:sanctum')->group(function () {
+    // Your authenticated routes go here
+    Route::post('/credit-money', 'WaafiApi@creditMoney');
+    Route::post('/pay-with-zaad', 'WaafiApi@payWithZaad');
+    Route::post('transections', [\App\Http\Controllers\Api\TransectionsController::class, 'store']);
+    Route::get('transections', [\App\Http\Controllers\Api\TransectionsController::class, 'index']);
+});
+
+// // Non-authenticated routes
+// Route::post('/non-authenticated-route', 'WaafiApi@index');
+
+// Route::middleware('auth')->group(function () {
+//     // Your authenticated routes go here
+//     Route::resource('/transections', 'TransectionsController');
+// });
+
+// cross transfer request
+
+Route::post('request', [\App\Http\Controllers\Api\cros_transfer_requests::class, 'store']);
+Route::get('request', function () {
+    // Your logic goes here
+    // Example: return a response
+    return response()->json(['message' => 'Hello from the "request" route']);
+});
+
+// wallets
+Route::prefix('wallets')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Api\WalletsController::class, 'index']);
+    Route::get('/{userId}', [\App\Http\Controllers\Api\WalletsController::class, 'show']);
+    Route::post('/{userId}', [\App\Http\Controllers\Api\WalletsController::class, 'store']);
+    Route::put('/{walletId}', [\App\Http\Controllers\Api\WalletsController::class, 'update']);
+    Route::delete('/{walletId}', [\App\Http\Controllers\Api\WalletsController::class, 'destroy']);
+});

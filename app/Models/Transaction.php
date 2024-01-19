@@ -10,6 +10,7 @@ class Transaction extends Model
     use HasFactory;
     protected $table = 'transaction'; 
     protected $primaryKey = 'id'; 
+    
     // protected $primaryKey = 'transaction_id'; // Assuming you are using UUID for 'transaction_id'
     // public $incrementing = false;
     protected $fillable = [
@@ -26,4 +27,9 @@ class Transaction extends Model
     ];
     
     public $incrementing = false;
+
+    public function user()
+{
+    return $this->belongsTo(User::class, 'user_id');
+}
 }

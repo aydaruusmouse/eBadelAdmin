@@ -11,7 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-
+    
     /**
      * The attributes that are mass assignable.
      *
@@ -19,7 +19,6 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name', 'password', 'telesom_number', 'somtel_number', 'email'
-
     ];
 
     /**
@@ -40,4 +39,18 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Define the 'transactions' relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'user_id');
+    }
+    public function wallets()
+    {
+        return $this->hasMany(Wallet::class, 'user_id');
+    }
 }

@@ -122,4 +122,22 @@ public function update(Request $request){
         'user' =>$user
     ]);
 }
+
+public function getCurrentUserWithTransactions(Request $request)
+    {
+        // Check if the user is authenticated
+        if (!Auth::check()) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        }
+
+        // Get the currently authenticated user
+        $user = Auth::user();
+
+        // Get all transactions associated with the user
+        $userTransactions = $user->transactions;
+
+        // You can now use $userTransactions as needed
+
+        return response()->json(['status' => 'success', 'user' => $user, 'transactions' => $userTransactions]);
+    }
 }

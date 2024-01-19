@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB; 
 use App\Models\Transaction;
+use App\Models\User;
 
 
 class WaafiApi extends Controller
@@ -24,7 +25,9 @@ class WaafiApi extends Controller
     public function creditMoney(Request $request){
         \Log::info('Database connection status: ' . (DB::connection()->getPdo() ? 'Connected' : 'Not connected'));
 
-
+        // if (!Auth::check()) {
+        //     return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        // }
             //  echo 'creditmoney';
       
              try {
@@ -92,6 +95,9 @@ class WaafiApi extends Controller
     }
     public function payWithZaad(Request $request)
     {
+        // if (!Auth::check()) {
+        //     return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        // }
        
         try {
             // Validate the request data
@@ -99,7 +105,12 @@ class WaafiApi extends Controller
                 'phoneNumber' => 'required|string',
                 'amount' => 'required|numeric|min:0',
             ]);
-            
+
+            $user = User::find(12); // Assuming user ID 12 exists
+
+if (!$user) {
+    return response()->json(['status' => 'error', 'message' => 'User not found'], 404);
+}
             // User amount and phone number.
             $phoneNumber = $validatedData['phoneNumber'];
             $amount = $validatedData['amount'];
@@ -141,9 +152,14 @@ class WaafiApi extends Controller
 
             // Check the response code and set payment status
             $paymentStatus = ($responseCode == 2001) ? 'success' : 'failed';
-
+            \Log::info('User ID passed to newPayment:', ['user_id' => $user->id]);
+            \Log::info('Phone number:', ['phoneNumber' => $phoneNumber]);
+            \Log::info('Amount:', ['amount' => $amount]);
+            \Log::info('Payment status:', ['paymentStatus' => $paymentStatus]);
+            \Log::info('API response message:', ['apiResponseMessage' => $apiResponseMessage]);
+    
             // Call the newPayment method to handle database insertion.
-            $response = $this->newPayment($phoneNumber, $amount, $paymentStatus, $apiResponseMessage);
+            $response = $this->newPayment(13, $phoneNumber, $amount, $paymentStatus, $apiResponseMessage);
 
             return response()->json(['status' => $paymentStatus, 'message' => $apiResponseMessage]);
         } catch (\Exception $e) {
@@ -157,44 +173,50 @@ class WaafiApi extends Controller
   
     // DB insertion 
 
-    public function newPayment($phoneNumber, $amount, $paymentStatus, $apiResponseMessage)
-{
-    try {
-        // echo $phoneNumber;
-        // echo $amount;
-        // Start a database transaction
-        DB::beginTransaction();
-        // $validatedData['transaction_id'] = Str::uuid();
-        // $validatedData['reference_id'] = Str::uuid();
-        // Create a new transaction record
-$transaction = Transaction::create([
-    'sender' => 'aidarous mouse',
-    'recipient' => 'aamin yousuf',
-    'recipient_phone' => $phoneNumber,
-    'amount' => $amount,
-    'paymentStatus' => $paymentStatus,
-    'apiResponseMessage' => $apiResponseMessage,
-    'date' => now()->toDateString(),
-    'time' => now()->toTimeString(),
-    'reference_id' => Str::uuid(), // Use Str::uuid() to generate a UUID for 'transaction_id'
-    'transaction_id' => Str::uuid(),
-]);
-
-
-        // Commit the transaction if everything is successful
-        DB::commit();
-
-        return response()->json(['status' => 'success', 'message' => 'Payment recorded successfully', 'data' => $transaction]);
-    } catch (\Exception $e) {
-        // Rollback the transaction in case of an exception
-        DB::rollBack();
-
-        // Log the exception details
-        \Log::error('Exception in newPayment: ' . $e->getMessage());
-
-        return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+    public function newPayment($userId, $phoneNumber, $amount, $paymentStatus, $apiResponseMessage)
+    {
+        try {
+            // Start a database transaction
+            DB::beginTransaction();
+    
+            // Get the user by ID
+            $user = User::find($userId);
+    
+            if (!$user) {
+                return response()->json(['status' => 'error', 'message' => 'User not found'], 404);
+            }
+    
+            // Create a new transaction record using the relationship
+            $transaction = $user->transactions()->create([
+                'sender' => 'aidarous mouse',
+                'recipient' => 'aamin yousuf',
+                'recipient_phone' => $phoneNumber,
+                'amount' => $amount,
+                'paymentStatus' => $paymentStatus,
+                'apiResponseMessage' => $apiResponseMessage,
+                'date' => now()->toDateString(),
+                'time' => now()->toTimeString(),
+                'reference_id' => Str::uuid(),
+                'transaction_id' => Str::uuid(),
+            ]);
+    
+            // Commit the transaction if everything is successful
+            DB::commit();
+    
+            return response()->json(['status' => 'success', 'message' => 'Payment recorded successfully', 'data' => $transaction]);
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of an exception
+            DB::rollBack();
+    
+            // Log the exception details
+            \Log::error('Exception in newPayment: ' . $e->getMessage());
+    
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
     }
-}
+    
+    
+
 
     
 
