@@ -59,6 +59,7 @@ class WaafiApi extends Controller
                         'paymentMethod' => 'MWALLET_ACCOUNT',
                         'payerInfo' => [
                             'accountNo' => $phoneNumber,
+                            
                         ],
                         'transactionInfo' => [
                             'referenceId' => $ref,
@@ -80,7 +81,7 @@ class WaafiApi extends Controller
                 $paymentStatus = ($responseCode == 2001) ? 'success' : 'failed';
     
                 // Call the newPayment method to handle database insertion.
-                $response = $this->newPayment($phoneNumber, $amount, $paymentStatus, $apiResponseMessage);
+                $response = $this->newPayment(1,$phoneNumber, $amount, $paymentStatus, $apiResponseMessage, $selectedOption);
     
                 return response()->json(['status' => $paymentStatus, 'message' => $apiResponseMessage]);
             } catch (\Exception $e) {
@@ -104,16 +105,20 @@ class WaafiApi extends Controller
             $validatedData = $request->validate([
                 'phoneNumber' => 'required|string',
                 'amount' => 'required|numeric|min:0',
+                'selectedOption' => 'required|string',
+                'currency' => 'required|string',
             ]);
 
-            $user = User::find(12); // Assuming user ID 12 exists
+            $user = User::find(1); // Assuming user ID 12 exists
 
 if (!$user) {
     return response()->json(['status' => 'error', 'message' => 'User not found'], 404);
 }
             // User amount and phone number.
             $phoneNumber = $validatedData['phoneNumber'];
+            $currency = $validatedData['currency'];
             $amount = $validatedData['amount'];
+            $selectedOption= $validatedData['selectedOption'];
             $desc = 'lacag bixin tijaabo ah';
             $requestId = rand(100000, 999999);
             $ref = rand(100000, 999999);
@@ -138,7 +143,7 @@ if (!$user) {
                         'referenceId' => $ref,
                         'invoiceId' => $invoiceId,
                         'amount' => $amount,
-                        'currency' => 'SLSH',
+                        'currency' => $currency,
                         'description' => $desc,
                     ]
                 ]
@@ -159,7 +164,7 @@ if (!$user) {
             \Log::info('API response message:', ['apiResponseMessage' => $apiResponseMessage]);
     
             // Call the newPayment method to handle database insertion.
-            $response = $this->newPayment(13, $phoneNumber, $amount, $paymentStatus, $apiResponseMessage);
+            $response = $this->newPayment(1, $phoneNumber, $amount, $paymentStatus, $apiResponseMessage, $selectedOption);
 
             return response()->json(['status' => $paymentStatus, 'message' => $apiResponseMessage]);
         } catch (\Exception $e) {
@@ -173,7 +178,7 @@ if (!$user) {
   
     // DB insertion 
 
-    public function newPayment($userId, $phoneNumber, $amount, $paymentStatus, $apiResponseMessage)
+    public function newPayment($userId, $phoneNumber, $amount, $paymentStatus, $apiResponseMessage, $selectedOption)
     {
         try {
             // Start a database transaction
@@ -188,15 +193,20 @@ if (!$user) {
     
             // Create a new transaction record using the relationship
             $transaction = $user->transactions()->create([
-                'sender' => 'aidarous mouse',
-                'recipient' => 'aamin yousuf',
-                'recipient_phone' => $phoneNumber,
+                'senders_wallet_name' => $selectedOption,
+                'receivers_wallet_name' => 'edahab',
+                'senders_account_name' => 'aidarous mouse',
+                'receivers_account_name' => $selectedOption,
+                'senders_account_number' => $phoneNumber,
+                'receivers_account_number' => $phoneNumber,
+                'currencies' => 'SLSH',
+                'swap_fee' => 0,
+                'excuted_by' => 'Api',
+                'wallet_type' => $selectedOption,
                 'amount' => $amount,
-                'paymentStatus' => $paymentStatus,
-                'apiResponseMessage' => $apiResponseMessage,
-                'date' => now()->toDateString(),
-                'time' => now()->toTimeString(),
-                'reference_id' => Str::uuid(),
+                'status' => $paymentStatus,
+                'debit_message' => $apiResponseMessage,
+                'credit_response' => $apiResponseMessage,
                 'transaction_id' => Str::uuid(),
             ]);
     

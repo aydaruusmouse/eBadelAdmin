@@ -24,7 +24,7 @@ class eDahab extends Controller
     {
         $edahabNumber = $request->input('edahabNumber');
         $amount = $request->input('amount');
-        $currency = $request->input('currency', 'SLSH'); // Default to 'USD' if not provided
+        $currency = $request->input('currency'); // Default to 'USD' if not provided
         // $returnUrl = $request->input('returnUrl'); // Use 'returnUrl' as it is in the example
 
         $client = new Client(['base_uri' => self::BASE_URL]);

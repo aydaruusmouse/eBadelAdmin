@@ -19,6 +19,7 @@ class CreateWalletsTable extends Migration
             $table->unsignedBigInteger('user_id'); // Foreign key
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('name');
+            $table->string('number');
         });
     }
 

@@ -30,9 +30,10 @@ Route::post('purchase', [\App\Http\Controllers\Api\WaafiApi::class, 'payWithZaad
 // route post with UserControll 
 Route::post('register', [\App\Http\Controllers\Api\UserControll::class, 'register']);
 Route::post('login', [\App\Http\Controllers\Api\UserControll::class, 'login']);
+Route::get('login', [\App\Http\Controllers\Api\UserControll::class, 'index']);
 Route::post('logout', [\App\Http\Controllers\Api\UserControll::class, 'logout']);
-
-
+Route::get('users', [\App\Http\Controllers\Api\UserControll::class, 'index']);
+Route::get('users/{userId}', [\App\Http\Controllers\Api\UserControll::class, 'show']);
 // ussd route
 Route::post('/process-ussd-codes', [\App\Http\Controllers\Api\UssdController::class, 'processUSSDCodes']);
 Route::get('/process-ussd-codes', [\App\Http\Controllers\Api\UssdController::class, 'index']);

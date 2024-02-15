@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\wallets;
+use Illuminate\Support\Facades\Auth;
+
 class WalletsController extends Controller
 {
     /**
@@ -16,7 +18,7 @@ class WalletsController extends Controller
     {
     
          // Retrieve all wallets
-         $wallets = Wallet::all();
+         $wallets = wallets::all();
 
          return response()->json(['status' => 'success', 'data' => $wallets]);
     }
@@ -29,21 +31,26 @@ class WalletsController extends Controller
      */
     public function store(Request $request)
     {
-        $userId = auth()->user()->id;
-
-        // Validate the request
-        $request->validate([
-            'name' => 'required|string',
-        ]);
-
-        // Create a new wallet for the user
-        $userWallet = wallets::create([
-            'user_id' => $userId,
-            'name' => $request->input('name'),
-        ]);
-
-        return response()->json(['status' => 'success', 'message' => 'Wallet created successfully', 'data' => $userWallet]);
+        if (Auth::check()) {
+            $userId = auth()->user()->id;
+    
+            // Validate the request
+            $request->validate([
+                'name' => 'required|string',
+            ]);
+    
+            // Create a new wallet for the user
+            $userWallet = wallets::create([
+                'user_id' => $userId,
+                'name' => $request->input('name'),
+            ]);
+    
+            return response()->json(['status' => 'success', 'message' => 'Wallet created successfully', 'data' => $userWallet]);
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'User not authenticated'], 401);
+        }
     }
+    
 
     /**
      * Display the specified resource.

@@ -6,9 +6,28 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
-
+use Laravel\Sanctum\PersonalAccessToken;
 class UserControll extends Controller
 {
+    // add index and read the data 
+  
+   public function index()
+   {
+       $users = User::all();
+       return response()->json(['status' => 'success', 'data' => $users]);
+   }
+
+   // Access a single user by its id
+   public function show($id)
+   {
+       $user = User::find($id);
+       if (!$user) {
+           return response()->json(['status' => 'error', 'message' => 'User not found']);
+       }
+
+       return response()->json(['status' => 'success', 'data' => $user]);
+   }
+
     public function register(Request $request)
     {
         // Validate the incoming request data
@@ -42,64 +61,96 @@ class UserControll extends Controller
 
         return response()->json(['success' => true, 'message' => 'User registered successfully.'], 201);
     }
-    public function login(Request $request)
+
+    
+ // Log in a user
+//  public function login(Request $request)
+//  {
+//      $validator = Validator::make($request->all(), [
+//          'telesom_number' => 'required|string',
+//      ]);
+
+//      if ($validator->fails()) {
+//          return response()->json(['status' => 'error', 'errors' => $validator->errors()], 400);
+//      }
+
+//      // Check if a user with the provided telesom_number exists
+//      $user = User::where('telesom_number', $request->telesom_number)->first();
+
+//      if ($user) {
+//          // If the user exists, generate a token and return it
+//          $token = $user->createToken('auth_token')->plainTextToken;
+//          return response()->json(['status' => 'success', 'token' => $token]);
+//      }
+
+//      // If no user found with the provided telesom_number, return an error
+//      return response()->json(['status' => 'error', 'message' => 'Invalid telesom number'], 401);
+//  }
+
+public function login(Request $request)
 {
     $validator = Validator::make($request->all(), [
-        'email' => 'required|email',
-        'password' => 'required|string',
-        'telesom_number' => 'nullable|string', // adjust validation as needed
-        'somtel_number' => 'nullable|string', // adjust validation as needed
+        'telesom_number' => 'required|string',
     ]);
 
     if ($validator->fails()) {
         return response()->json(['status' => 'error', 'errors' => $validator->errors()], 400);
     }
 
-    $credentials = $request->only('email', 'password');
+    // Check if a user with the provided telesom_number exists
+    $user = User::where('telesom_number', $request->telesom_number)->first();
 
-    // Add conditions for telesom_number and somtel_number if provided
-    if ($request->has('telesom_number')) {
-        $credentials['telesom_number'] = $request->telesom_number;
-    }
-
-    if ($request->has('somtel_number')) {
-        $credentials['somtel_number'] = $request->somtel_number;
-    }
-
-    if (Auth::attempt($credentials)) {
-        $user = Auth::user();
+    if ($user) {
+        // If the user exists, generate a token
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        // Store the token in the personal_access_tokens table
+        $tokenModel = new PersonalAccessToken();
+        $tokenModel->forceFill([
+            'tokenable_id' => $user->id,
+            'tokenable_type' => get_class($user),
+            'name' => 'auth_token',
+            'token' => $token,
+            'abilities' => ['*'],
+        ])->save();
 
         return response()->json(['status' => 'success', 'token' => $token]);
     }
 
-    return response()->json(['status' => 'error', 'message' => 'Invalid credentials'], 401);
-}
-public function logout(Request $request)
-{
-    Auth::logout();
-
-    return response()->json(['status' => 'success', 'message' => 'Logged out successfully']);
+    // If no user found with the provided telesom_number, return an error
+    return response()->json(['status' => 'error', 'message' => 'Invalid telesom number'], 401);
 }
 
-    public function getCurrentUser(Request $request){
-       if(!User::checkToken($request)){
-           return response()->json([
-            'message' => 'Token is required'
-           ],422);
-       }
-        
-        $user = JWTAuth::parseToken()->authenticate();
-       // add isProfileUpdated....
-       $isProfileUpdated=false;
-        if($user->isPicUpdated==1 && $user->isEmailUpdated){
-            $isProfileUpdated=true;
-            
-        }
-        $user->isProfileUpdated=$isProfileUpdated;
+ // Log out a user
+ public function logout(Request $request)
+ {
+     Auth::logout();
 
-        return $user;
-}
+     return response()->json(['status' => 'success', 'message' => 'Logged out successfully']);
+ }
+
+ // Get the current user
+ public function getCurrentUser(Request $request)
+ {
+     if (!User::checkToken($request)) {
+         return response()->json([
+             'message' => 'Token is required'
+         ], 422);
+     }
+     
+     $user = JWTAuth::parseToken()->authenticate();
+
+     // Add isProfileUpdated....
+     $isProfileUpdated = false;
+     if ($user->isPicUpdated == 1 && $user->isEmailUpdated) {
+         $isProfileUpdated = true;
+     }
+     $user->isProfileUpdated = $isProfileUpdated;
+
+     return $user;
+ }
+
+
 
    
 public function update(Request $request){

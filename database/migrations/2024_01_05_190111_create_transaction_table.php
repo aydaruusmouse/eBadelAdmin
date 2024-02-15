@@ -19,15 +19,21 @@ class CreateTransactionTable extends Migration
                 $table->timestamps();
                 $table->unsignedBigInteger('user_id'); // Foreign key
                 $table->foreign('user_id')->references('id')->on('users');
-                $table->string('sender');
-                $table->string('recipient');
+                $table->string('wallet_type');
+                $table->string('Order_id')->default(''); 
+                $table->string('senders_wallet_name');
+                $table->string('receivers_wallet_name');
+                $table->string('senders_account_number');
+                $table->string('receivers_account_number');
+                $table->string('senders_account_name');
+                $table->string('receivers_account_name');
+                $table->string('currencies');
+                $table->string('swap_fee');
+                $table->string('excuted_by');
                 $table->string('amount');
-                $table->string('paymentStatus');
-                $table->string('apiResponseMessage');
-                $table->string('recipient_phone');
-                $table->date('date');
-                $table->time('time');
-                $table->uuid('reference_id');
+                $table->string('status');
+                $table->string('debit_Message');
+                $table->string('credit_response');
                 $table->uuid('transaction_id'); 
             });
         }

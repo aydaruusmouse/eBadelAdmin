@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Transaction;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth; 
-
+use Illuminate\Support\Facades\Log;
 class TransectionsController extends Controller
 {
     public function index()
@@ -25,11 +25,12 @@ class TransectionsController extends Controller
         // Get the authenticated user
         $user = Auth::user();
 
-        // Fetch only the transactions for the authenticated user
-        $transactions = Transaction::where('recipient_phone', $user->telesom_number)
-            ->with('user')
-            ->get();
-            \Log::info('User Transactions:', ['transactions' => Auth::user()->transactions]);
+               // Fetch transactions for the authenticated user
+               $transactions = Transaction::where('receivers_account_number', $user->telesom_number)
+               ->with('user')
+               ->get();
+
+           Log::info('Transactions fetched successfully');
 
         return response()->json(['status' => 'success', 'data' => $transactions]);
     } catch (\Exception $e) {
