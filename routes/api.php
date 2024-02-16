@@ -95,3 +95,34 @@ Route::prefix('wallets')->group(function () {
     Route::put('/{walletId}', [\App\Http\Controllers\Api\WalletsController::class, 'update']);
     Route::delete('/{walletId}', [\App\Http\Controllers\Api\WalletsController::class, 'destroy']);
 });
+
+
+
+
+// User Profile Routes
+Route::get('user-profiles', [\App\Http\Controllers\Api\UserProfileController::class, 'index']);
+// Route::post('user-profiles', [\App\Http\Controllers\Api\UserProfileController::class, 'store']);
+Route::post('user_register', [\App\Http\Controllers\Api\UserProfileController::class, 'register']);
+Route::post('user_login', [\App\Http\Controllers\Api\UserProfileController::class, 'login']);
+Route::get('user_getUser', [\App\Http\Controllers\Api\UserProfileController::class, 'register']);
+
+// Wallets Profile Routes
+Route::get('wallets-profiles', [\App\Http\Controllers\Api\WalletsProfileController::class, 'index']);
+Route::post('wallets-profiles', [\App\Http\Controllers\Api\WalletsProfileController::class, 'store']);
+
+// Notifications Routes
+Route::get('notifications', [\App\Http\Controllers\Api\NotificationsController::class, 'index']);
+Route::post('notifications', [\App\Http\Controllers\Api\NotificationsController::class, 'store']);
+
+// Orders Routes
+Route::get('orders', [\App\Http\Controllers\Api\OrdersController::class, 'index']);
+Route::post('orders', [\App\Http\Controllers\Api\OrdersController::class, 'store']);
+
+// User Wallet Accounts Routes
+Route::middleware('auth:sanctum')->group(function () {
+Route::get('user-wallet-accounts', [\App\Http\Controllers\Api\UserWalletAccountsController::class, 'index']);
+Route::post('user-wallet-accounts', [\App\Http\Controllers\Api\UserWalletAccountsController::class, 'store']);
+});
+// Bridge Fee Routes
+Route::get('bridge-fees', [\App\Http\Controllers\Api\BridgeFeeController::class, 'index']);
+Route::post('bridge-fees', [\App\Http\Controllers\Api\BridgeFeeController::class, 'store']);
