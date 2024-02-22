@@ -1,18 +1,18 @@
-<?php
+ <?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 class CreateOrdersTable extends Migration
-{
+ {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
-    {
+     public function up()
+     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id('Order_Id');
             $table->integer('User_Profile_Id')->nullable();

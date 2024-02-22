@@ -100,12 +100,22 @@ Route::prefix('wallets')->group(function () {
 
 
 // User Profile Routes
-Route::get('user-profiles', [\App\Http\Controllers\Api\UserProfileController::class, 'index']);
+// Route::get('user-profiles', [\App\Http\Controllers\Api\UserProfileController::class, 'index']);
 // Route::post('user-profiles', [\App\Http\Controllers\Api\UserProfileController::class, 'store']);
 Route::post('user_register', [\App\Http\Controllers\Api\UserProfileController::class, 'register']);
 Route::post('user_login', [\App\Http\Controllers\Api\UserProfileController::class, 'login']);
-Route::get('user_getUser', [\App\Http\Controllers\Api\UserProfileController::class, 'register']);
-
+// Route::middleware('auth:sanctum')->group(function () {
+//     Route::post('user-profiles', [\App\Http\Controllers\Api\UserProfileController::class, 'store']);
+//     Route::get('user-profiles', [\App\Http\Controllers\Api\UserProfileController::class, 'index']);
+//     // Route::get('user-profiles/{userId}', [\App\Http\Controllers\Api\UserProfileController::class, 'authUser']);
+//     Route::put('user-profiles/{userId}', [\App\Http\Controllers\Api\UserProfileController::class, 'update']);
+//     Route::delete('user-profiles/{userId}', [\App\Http\Controllers\Api\UserProfileController::class, 'destroy']);
+//     Route::post('user_logout', [\App\Http\Controllers\Api\UserProfileController::class, 'logout']);
+// });
+// Route::get('user_user', [\App\Http\Controllers\Api\UserProfileController::class, 'authUser']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('user_user', [\App\Http\Controllers\Api\UserProfileController::class, 'authUser']);
+    });
 // Wallets Profile Routes
 Route::get('wallets-profiles', [\App\Http\Controllers\Api\WalletsProfileController::class, 'index']);
 Route::post('wallets-profiles', [\App\Http\Controllers\Api\WalletsProfileController::class, 'store']);

@@ -17,6 +17,34 @@ class UserProfileController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    // authenticated user info
+
+    public function authUser()
+{
+    // Check if the user is authenticated
+    if (auth()->check()) {
+        $authenticatedUserProfileId = auth()->user()->User_Profile_Id;
+        $loginProfileInfo = UserProfile::where('User_Profile_Id', $authenticatedUserProfileId)->first();
+
+        if (!$loginProfileInfo) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        return response()->json([
+            'User_Profile_Id' => $loginProfileInfo->User_Profile_Id,
+            'Login_Phone' => $loginProfileInfo->Login_Phone,
+            'First_Name' => $loginProfileInfo->First_Name,
+            'Last_Name' => $loginProfileInfo->Last_Name,
+            'Gender' => $loginProfileInfo->Gender,
+            'Date_of_Birth' => $loginProfileInfo->Date_of_Birth,
+        ]);
+    } else {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+}
+
+    
+
     public function index()
    {
        $users = UserProfile::all();
@@ -30,7 +58,7 @@ class UserProfileController extends Controller
             'First_Name' => 'required|string',
             'Last_Name' => 'required|string',
             'Gender' => 'required|in:male,female',
-            'Date_of_Birth' => 'required|date_format:Y-m-d',
+            // 'Date_of_Birth' => 'required|date_format:Y-m-d',
             // 'Join_Date' => 'required|date',
         ]);
     
@@ -46,8 +74,10 @@ class UserProfileController extends Controller
         if (!$created) {
             return response()->json(['success' => false, 'message' => 'User registration failed.'], 500);
         }
-    
-        return response()->json(['success' => true, 'message' => 'User registered successfully.'], 201);
+    // Generate a token for the registered user
+    $token = $created->createToken('auth_token')->plainTextToken;
+   
+return response()->json(['success' => true, 'message' => 'User registered successfully.', 'token' => $token], 201);
     }
 
     // login

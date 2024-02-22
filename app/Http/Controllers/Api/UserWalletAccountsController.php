@@ -18,9 +18,11 @@ class UserWalletAccountsController extends Controller
      */
     public function index()
     {
-        $walletProfiles = UserWalletAccount::all();
+        $authenticatedUserProfileId = auth()->user()->User_Profile_Id;
+        $walletProfiles = UserWalletAccount::where('User_Profile_Id', $authenticatedUserProfileId)->get();
         return response()->json($walletProfiles);
     }
+    
 
     /**
      * Store a newly created resource in storage.
@@ -33,6 +35,8 @@ class UserWalletAccountsController extends Controller
     $request->validate([
         'Account_Number' => 'required',
         'Account_Name' => 'required',
+        'Wallet_Id'=> 'required',
+        'Status'=> 'required',
     ]);
 
     if (!Auth::check()) {
@@ -43,13 +47,16 @@ class UserWalletAccountsController extends Controller
     \Log::info('Authenticated User ID:', ['user_id' => $user->User_Profile_Id]);
     \Log::info('Authenticated User ID:', ['user_id' => $user]); // Remove ->id from $user
 
-    $walletId = 1; // Use the ID of the specific wallet you want to use
+    $walletId = $request->input('Wallet_Id');
+    $walletStatus = $request->input('Status');
+    // $walletId=1;
 
     $data = [
         'Account_Number' => $request->Account_Number,
         'Account_Name' => $request->Account_Name,
         'User_Profile_Id' => $user->User_Profile_Id, // Set User_Profile_Id to the authenticated user's ID
         'Wallet_Id' => $walletId,
+        'Status' => $walletStatus,
     ];
 
     $walletAccount = UserWalletAccount::create($data);

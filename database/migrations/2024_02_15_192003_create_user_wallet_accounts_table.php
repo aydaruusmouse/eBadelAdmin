@@ -17,6 +17,7 @@ class CreateUserWalletAccountsTable extends Migration
             $table->id('User_Wallet_Account_Id');
             $table->integer('User_Profile_Id')->nullable();
             $table->integer('Wallet_Id')->nullable();
+            $table->enum('Status', ['active', 'inactive'])->nullable();
             $table->string('Account_Number')->nullable();
             $table->string('Account_Name')->nullable();
             $table->dateTime('created_at')->useCurrent();

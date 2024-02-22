@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB; 
 use App\Models\Transaction;
 use App\Models\User;
-
-
+use Illuminate\Support\Facades\Auth; 
+use App\Models\UserProfile;
 class WaafiApi extends Controller
 {
 
@@ -109,11 +109,11 @@ class WaafiApi extends Controller
                 'currency' => 'required|string',
             ]);
 
-            $user = User::find(1); // Assuming user ID 12 exists
+//             $user = auth()->user()->User_Profile_Id; // Assuming user ID 12 exists
 
-if (!$user) {
-    return response()->json(['status' => 'error', 'message' => 'User not found'], 404);
-}
+// if (!$user) {
+//     return response()->json(['status' => 'error', 'message' => 'User not found'], 404);
+// }
             // User amount and phone number.
             $phoneNumber = $validatedData['phoneNumber'];
             $currency = $validatedData['currency'];
@@ -156,17 +156,18 @@ if (!$user) {
             $apiResponseMessage = $returnData['responseMsg'];
 
             // Check the response code and set payment status
-            $paymentStatus = ($responseCode == 2001) ? 'success' : 'failed';
-            \Log::info('User ID passed to newPayment:', ['user_id' => $user->id]);
-            \Log::info('Phone number:', ['phoneNumber' => $phoneNumber]);
-            \Log::info('Amount:', ['amount' => $amount]);
-            \Log::info('Payment status:', ['paymentStatus' => $paymentStatus]);
-            \Log::info('API response message:', ['apiResponseMessage' => $apiResponseMessage]);
+            // $paymentStatus = ($responseCode == 2001) ? 'success' : 'failed';
+            // \Log::info('User ID passed to newPayment:', ['user_id' => $user->id]);
+            // \Log::info('Phone number:', ['phoneNumber' => $phoneNumber]);
+            // \Log::info('Amount:', ['amount' => $amount]);
+            // \Log::info('Payment status:', ['paymentStatus' => $paymentStatus]);
+            // \Log::info('API response message:', ['apiResponseMessage' => $apiResponseMessage]);
     
-            // Call the newPayment method to handle database insertion.
-            $response = $this->newPayment(1, $phoneNumber, $amount, $paymentStatus, $apiResponseMessage, $selectedOption);
+            // // Call the newPayment method to handle database insertion.
+            // $response = $this->newPayment(1, $phoneNumber, $amount, $paymentStatus, $apiResponseMessage, $selectedOption);
 
-            return response()->json(['status' => $paymentStatus, 'message' => $apiResponseMessage]);
+            // return response()->json(['status' => $paymentStatus, 'message' => $apiResponseMessage]);
+              return response()->json(['status'=> $apiResponseMessage]);
         } catch (\Exception $e) {
             // Log the full exception details
             \Log::error('Exception in payWithZaad: ' . $e->getMessage());
@@ -178,52 +179,52 @@ if (!$user) {
   
     // DB insertion 
 
-    public function newPayment($userId, $phoneNumber, $amount, $paymentStatus, $apiResponseMessage, $selectedOption)
-    {
-        try {
-            // Start a database transaction
-            DB::beginTransaction();
+    // public function newPayment($userId, $phoneNumber, $amount, $paymentStatus, $apiResponseMessage, $selectedOption)
+    // {
+    //     try {
+    //         // Start a database transaction
+    //         DB::beginTransaction();
     
-            // Get the user by ID
-            $user = User::find($userId);
+    //         // Get the user by ID
+    //         $user = User::find($userId);
     
-            if (!$user) {
-                return response()->json(['status' => 'error', 'message' => 'User not found'], 404);
-            }
+    //         if (!$user) {
+    //             return response()->json(['status' => 'error', 'message' => 'User not found'], 404);
+    //         }
     
-            // Create a new transaction record using the relationship
-            $transaction = $user->transactions()->create([
-                'senders_wallet_name' => $selectedOption,
-                'receivers_wallet_name' => 'edahab',
-                'senders_account_name' => 'aidarous mouse',
-                'receivers_account_name' => $selectedOption,
-                'senders_account_number' => $phoneNumber,
-                'receivers_account_number' => $phoneNumber,
-                'currencies' => 'SLSH',
-                'swap_fee' => 0,
-                'excuted_by' => 'Api',
-                'wallet_type' => $selectedOption,
-                'amount' => $amount,
-                'status' => $paymentStatus,
-                'debit_message' => $apiResponseMessage,
-                'credit_response' => $apiResponseMessage,
-                'transaction_id' => Str::uuid(),
-            ]);
+    //         // Create a new transaction record using the relationship
+    //         $transaction = $user->transactions()->create([
+    //             'senders_wallet_name' => $selectedOption,
+    //             'receivers_wallet_name' => 'edahab',
+    //             'senders_account_name' => 'aidarous mouse',
+    //             'receivers_account_name' => $selectedOption,
+    //             'senders_account_number' => $phoneNumber,
+    //             'receivers_account_number' => $phoneNumber,
+    //             'currencies' => 'SLSH',
+    //             'swap_fee' => 0,
+    //             'excuted_by' => 'Api',
+    //             'wallet_type' => $selectedOption,
+    //             'amount' => $amount,
+    //             'status' => $paymentStatus,
+    //             'debit_message' => $apiResponseMessage,
+    //             'credit_response' => $apiResponseMessage,
+    //             'transaction_id' => Str::uuid(),
+    //         ]);
     
-            // Commit the transaction if everything is successful
-            DB::commit();
+    //         // Commit the transaction if everything is successful
+    //         DB::commit();
     
-            return response()->json(['status' => 'success', 'message' => 'Payment recorded successfully', 'data' => $transaction]);
-        } catch (\Exception $e) {
-            // Rollback the transaction in case of an exception
-            DB::rollBack();
+    //         return response()->json(['status' => 'success', 'message' => 'Payment recorded successfully', 'data' => $transaction]);
+    //     } catch (\Exception $e) {
+    //         // Rollback the transaction in case of an exception
+    //         DB::rollBack();
     
-            // Log the exception details
-            \Log::error('Exception in newPayment: ' . $e->getMessage());
+    //         // Log the exception details
+    //         \Log::error('Exception in newPayment: ' . $e->getMessage());
     
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
-        }
-    }
+    //         return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+    //     }
+    // }
     
     
 

@@ -18,6 +18,7 @@ class UserWalletAccount extends Model
         'Account_Name',
         'User_Profile_Id',
         'Wallet_Id',
+        'Status',
     ];
 
     public function userProfile()
@@ -28,5 +29,9 @@ class UserWalletAccount extends Model
     public function walletProfile()
     {
         return $this->belongsTo(WalletProfile::class, 'Wallet_Id');
+    }
+    public function walletStatus()
+    {
+        return $this->belongsTo(WalletProfile::class, 'Status');
     }
 }
