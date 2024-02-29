@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUserWalletAccountsTable extends Migration
+class CreateWalletsProfilesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,14 @@ class CreateUserWalletAccountsTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_wallet_accounts', function (Blueprint $table) {
-            $table->id('User_Wallet_Account_Id');
-            $table->integer('User_Profile_Id')->nullable();
-            $table->integer('Wallet_Id')->nullable();
+        Schema::create('wallets_profiles', function (Blueprint $table) {
+            $table->id('Wallet_Id');
+            $table->string('Wallet_Name')->nullable();
+            $table->string('Wallet_Provider')->nullable();
+            $table->string('Wallet_Type')->nullable();
+            $table->string('Wallet_Logo')->nullable();
+            $table->string('Merchant_Number')->nullable();
             $table->enum('Status', ['active', 'inactive'])->nullable();
-            $table->string('Account_Number')->nullable();
-            $table->string('Account_Name')->nullable();
             $table->dateTime('created_at')->useCurrent();
             $table->dateTime('updated_at')->useCurrent();
         });
@@ -32,6 +33,6 @@ class CreateUserWalletAccountsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_wallet_accounts');
+        Schema::dropIfExists('wallets_profiles');
     }
 }

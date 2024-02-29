@@ -31,7 +31,7 @@ class WalletsProfileController extends Controller
             'Wallet_Provider' => 'required',
             'Wallet_Type' => 'required',
             'Merchant_Number' => 'required',
-            'Status' => 'required',
+            // 'Status' => 'required',
         ]);
 
         $walletProfile = WalletProfile::create($request->all());
@@ -66,7 +66,7 @@ class WalletsProfileController extends Controller
             'Wallet_Provider' => 'required',
             'Wallet_Type' => 'required',
             'Merchant_Number' => 'required',
-            'Status' => 'required',
+            // 'Status' => 'required',
             
         ]);
 

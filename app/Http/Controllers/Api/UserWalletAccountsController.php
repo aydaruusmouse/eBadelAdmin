@@ -36,7 +36,7 @@ class UserWalletAccountsController extends Controller
         'Account_Number' => 'required',
         'Account_Name' => 'required',
         'Wallet_Id'=> 'required',
-        'Status'=> 'required',
+        // 'Status'=> 'required',
     ]);
 
     if (!Auth::check()) {
@@ -56,7 +56,7 @@ class UserWalletAccountsController extends Controller
         'Account_Name' => $request->Account_Name,
         'User_Profile_Id' => $user->User_Profile_Id, // Set User_Profile_Id to the authenticated user's ID
         'Wallet_Id' => $walletId,
-        'Status' => $walletStatus,
+        // 'Status' => $walletStatus,
     ];
 
     $walletAccount = UserWalletAccount::create($data);

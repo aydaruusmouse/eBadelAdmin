@@ -9,6 +9,8 @@ class WalletProfile extends Model
 {
     protected $table = 'wallets_profiles';
     protected $primaryKey = 'Wallet_Id';
+    // protected $primaryKey = null; // Remove primary key definition
+    // public $incrementing = true;
     public $timestamps = true;
     use HasFactory;
 

@@ -15,7 +15,8 @@ class CreateOrdersTable extends Migration
      {
         Schema::create('orders', function (Blueprint $table) {
             $table->id('Order_Id');
-            $table->integer('User_Profile_Id')->nullable();
+            $table->unsignedBigInteger('User_Profile_Id')->nullable();
+            $table->foreign('User_Profile_Id')->references('User_Profile_Id')->on('user_profiles');
             $table->string('Origin_Wallet')->nullable();
             $table->string('Destination_Wallet')->nullable();
             $table->string('Sender_Account')->nullable();

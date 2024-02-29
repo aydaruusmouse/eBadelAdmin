@@ -18,7 +18,7 @@ class UserProfile extends Authenticatable
         'Login_Phone',
         'First_Name',
         'Last_Name',
-        // 'Date_of_Birth',
+        'Date_of_Birth',
         'Gender',
     ];
    

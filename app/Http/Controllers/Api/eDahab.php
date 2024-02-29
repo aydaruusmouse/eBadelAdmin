@@ -6,7 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request as HttpRequest;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\DB; 
+use App\Models\Order;
+use Illuminate\Support\Facades\Auth; 
+use App\Models\UserProfile;
+// use App\Models\UserProfile;
 class eDahab extends Controller
 {
     private const BASE_URL = 'https://edahab.net/api/api/';
@@ -22,18 +26,46 @@ class eDahab extends Controller
 
     public function createInvoiceAsync(HttpRequest $request)
     {
-        $edahabNumber = $request->input('edahabNumber');
+        \Log::info('the amount is :', ['request' => $request->input('amount')]);
+        // Retrieve data from the request
+        \Log::info('the currency is :', ['request' => $request->input('currency')]);
+        \Log::info('the senderAccount is :', ['request' => $request->input('senderaccount')]);
+        
         $amount = $request->input('amount');
-        $currency = $request->input('currency'); // Default to 'USD' if not provided
-        // $returnUrl = $request->input('returnUrl'); // Use 'returnUrl' as it is in the example
+        $currency = $request->input('currency'); 
+        $originwallet= $request->input('originwallet');
+        $destinationwallet= $request->input('destinationwallet');
+        $senderAccount= $request->input('senderaccount');
+        $recipientAccount= $request->input('recipientaccount');
+        $originCurrency= $request->input('originCurrency');
+        $destinationCurrency= $request->input('destinationCurrency');
+        $bridgeFee= $request->input('bridgeFee');
+        $selectedOption= $request->input('selectedOption');
+        // $debitResponse= $request->input('debitResponse');
+        // $creditResponse= $request->input('creditResponse');
+        // $status= $request->input('status');
+
+        // Default to 'USD' if not provided
+        $returnUrl = $request->input('returnUrl'); // Use 'returnUrl' as it is in the example
 
         $client = new Client(['base_uri' => self::BASE_URL]);
+        
+        if (!Auth::check()) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        }
 
+
+    
+        $user = Auth::user();
+        \Log::info('Authenticated User ID:', ['user_id' => $user->User_Profile_Id]);
+// Remove ->id from $user
+        $userId= $user->User_Profile_Id;
+        \Log::info('the userId is :', ['user_id' => $userId]); // Remove ->id from $user
         $requestPayload = [
             'apiKey' => self::API_KEY,
-            'edahabNumber' => $edahabNumber,
+            'Edahabnumber' => $senderAccount,
             'amount' => $amount,
-            'currency' => $currency,
+            'origincurrency' => $originCurrency,
             'agentCode' => self::AGENT_CODE,
             // 'returnUrl' => $returnUrl,
         ];
@@ -60,13 +92,69 @@ class eDahab extends Controller
             $result = json_decode($content);
 
             // $this->checkInvoiceStatus(); // Call the method with $this->
-
+            $paymentStatus = ($statusCode == 2001) ? 'success' : 'failed';
+            \Log::info('User ID passed to newPayment:', ['user_id' => $user->User_Profile_Id]);
+            \Log::info('Phone number:', ['senderAccount' => $senderAccount]);
+            \Log::info('Amount:', ['amount' => $amount]);
+          
+            // Call the newPayment method to handle database insertion.
+            $response = $this->newPayment($user->User_Profile_Id, $senderAccount, $amount, $paymentStatus, 'noo', $selectedOption, $originwallet, $destinationwallet, $senderAccount, $recipientAccount, $originCurrency, $destinationCurrency, $bridgeFee, 'success', 'pending', 'active');
+            \Log::info('Amount:', ['respond' => $response]);
+          
+            // return response()->json(['status' => $paymentStatus, 'message' => $apiResponseMessage]);
+            //   return response()->json(['status'=> $apiResponseMessage]);
             return json_encode($result ?: new DahabResponse(['StatusCode' => 6]));
         } catch (\Exception $e) {
             Log::error($e);
             return json_encode(new DahabResponse(['StatusCode' => 6]));
         }
     }
+    public function newPayment($userId, $phoneNumber, $amount, $paymentStatus, $apiResponseMessage, $selectedOption, $originwallet, $destinationwallet, $senderAccount, $recipientAccount, $originCurrency, $destinationCurrency, $bridgeFee, $debitResponse, $creditResponse, $status)
+    {
+       
+        try {
+            // Start a database transaction
+            DB::beginTransaction();
+    
+            // Get the user by ID
+            $user = UserProfile::find($userId);
+            // auth()->user()->User_Profile_Id
+            \Log::info('User ID passed to newPayment is aidoo:', ['user_id' => $user]);
+            if (!$user) {
+                return response()->json(['status' => 'error', 'message' => 'User not found'], 404);
+            }
+    
+            // Create a new transaction record using the relationship
+            $transaction = $user->orders()->create([
+                'User_Profile_Id' => $user, // Use $userId instead of $user
+                'Origin_Wallet' => $originwallet,
+                'Destination_Wallet' => $destinationwallet,
+                'Sender_Account' => $senderAccount,
+                'Recipient_Account' => $recipientAccount,
+                'Origin_Currency' => $originCurrency,
+                'Destination_Currency' => $destinationCurrency,
+                'Amount' => $amount,
+                'Bridge_Fee' => $bridgeFee,
+                'Debit_Response' => 'success',
+                'Credit_Response' => 'pending',
+                'Status' => 'active',
+            ]);
+    
+            // Commit the transaction if everything is successful
+            DB::commit();
+    
+            return response()->json(['status' => 'success', 'message' => 'Payment recorded successfully', 'data' => $transaction]);
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of an exception
+            DB::rollBack();
+    
+            // Log the exception details
+            \Log::error('Exception in newPayment: ' . $e->getMessage());
+    
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+    // credit money
     public function CreditMoney(HttpRequest $request)
 {
     // Controller logic to handle credit operation
