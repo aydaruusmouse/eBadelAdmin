@@ -27,7 +27,7 @@ class CreateOrdersTable extends Migration
             $table->double('Bridge_Fee')->nullable();
             $table->string('Debit_Response')->nullable();
             $table->string('Credit_Response')->nullable();
-            $table->enum('Status', ['active', 'inactive'])->nullable();
+            $table->enum('Status', ['Pending', 'Success'])->nullable();
             $table->dateTime('created_at')->useCurrent();
             $table->dateTime('updated_at')->useCurrent();
         });

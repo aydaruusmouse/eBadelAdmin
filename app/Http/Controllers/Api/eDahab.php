@@ -65,7 +65,7 @@ class eDahab extends Controller
             'apiKey' => self::API_KEY,
             'Edahabnumber' => $senderAccount,
             'amount' => $amount,
-            'origincurrency' => $originCurrency,
+            'currency' => $originCurrency,
             'agentCode' => self::AGENT_CODE,
             // 'returnUrl' => $returnUrl,
         ];
@@ -137,7 +137,7 @@ class eDahab extends Controller
                 'Bridge_Fee' => $bridgeFee,
                 'Debit_Response' => 'success',
                 'Credit_Response' => 'pending',
-                'Status' => 'active',
+                'Status' => 'Success',
             ]);
     
             // Commit the transaction if everything is successful

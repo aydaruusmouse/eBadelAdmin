@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\BridgeFee;
 
 class BridgeFeeController extends Controller
 {
@@ -16,7 +17,16 @@ class BridgeFeeController extends Controller
     {
         //
     }
-
+     
+    public function readBrigdeFee(){
+        $feePercentage = BridgeFee::where('Origin_Wallet', 'Zaad')
+    ->where('Destination_Wallet', 'eBirr')
+    ->where('Origin_Currency', 'USD')
+    ->where('Destination_Currency', 'BIRR')
+    ->pluck('Fee_Percentage')
+    ->first();
+    return response()->json($feePercentage);
+    }
     /**
      * Store a newly created resource in storage.
      *
@@ -25,7 +35,30 @@ class BridgeFeeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        {
+            // Validate the request data
+            $request->validate([
+                'Origin_Wallet' => 'required|string',
+                'Destination_Wallet' => 'required|string',
+                'Origin_Currency' => 'required|string',
+                'Destination_Currency' => 'required|string',
+                'Fee_Percentage' => 'required|numeric',
+            ]);
+    
+            // Create a new BridgeFee instance
+            $bridgeFee = new BridgeFee();
+            $bridgeFee->Origin_Wallet = $request->input('Origin_Wallet');
+            $bridgeFee->Destination_Wallet = $request->input('Destination_Wallet');
+            $bridgeFee->Origin_Currency = $request->input('Origin_Currency');
+            $bridgeFee->Destination_Currency = $request->input('Destination_Currency');
+            $bridgeFee->Fee_Percentage = $request->input('Fee_Percentage');
+    
+            // Save the BridgeFee instance
+            $bridgeFee->save();
+    
+            // Return a success response
+            return response()->json(['message' => 'Bridge fee saved successfully'], 201);
+        }
     }
 
     /**

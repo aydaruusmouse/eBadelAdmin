@@ -78,17 +78,24 @@ class WalletsController extends Controller
          // Validate the request
          $request->validate([
             'name' => 'required|string',
+            'status' => 'required|string', // Add validation for status field
         ]);
 
         // Update the wallet
-        $wallet = wallets::findOrFail($walletId);
+        $wallet = WalletProfile::findOrFail($id);
         $wallet->update([
-            'name' => $request->input('name'),
+            'Wallet_Name' => $request->input('name'),
+            'Status' => $request->input('status'), // Update the Status field
         ]);
+
+        // Update the status of associated UserWalletAccount instances
+        $userWalletAccounts = $wallet->userWalletAccounts;
+        foreach ($userWalletAccounts as $userWalletAccount) {
+            $userWalletAccount->update(['Status' => $request->input('status')]);
+        }
 
         return response()->json(['status' => 'success', 'message' => 'Wallet updated successfully', 'data' => $wallet]);
     }
-
     /**
      * Remove the specified resource from storage.
      *

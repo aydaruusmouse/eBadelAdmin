@@ -23,6 +23,15 @@ class UserWalletAccountsController extends Controller
         return response()->json($walletProfiles);
     }
     
+    public function Userwallets()
+    {
+        $authenticatedUserProfileId = auth()->user()->User_Profile_Id;
+        $walletProfiles = UserWalletAccount::where('User_Profile_Id', $authenticatedUserProfileId)
+            ->where('Status', 'active') // Add this line to filter by active status
+            ->get();
+
+        return response()->json($walletProfiles);
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -56,7 +65,7 @@ class UserWalletAccountsController extends Controller
         'Account_Name' => $request->Account_Name,
         'User_Profile_Id' => $user->User_Profile_Id, // Set User_Profile_Id to the authenticated user's ID
         'Wallet_Id' => $walletId,
-        // 'Status' => $walletStatus,
+        'Status' => $walletStatus,
     ];
 
     $walletAccount = UserWalletAccount::create($data);

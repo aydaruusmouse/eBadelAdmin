@@ -129,6 +129,10 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('wallets-profiles', [\App\Http\Controllers\Api\WalletsProfileController::class, 'index']);
 Route::post('wallets-profiles', [\App\Http\Controllers\Api\WalletsProfileController::class, 'store']);
 
+Route::prefix('wallets_profile')->group(function () {
+    Route::put('/{id}', [\App\Http\Controllers\Api\WalletsProfileController::class, 'update']);
+    Route::delete('/{id}', [WalletsController::class, 'destroy']);
+});
 // Notifications Routes
 Route::get('notifications', [\App\Http\Controllers\Api\NotificationsController::class, 'index']);
 Route::post('notifications', [\App\Http\Controllers\Api\NotificationsController::class, 'store']);
@@ -141,11 +145,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('orders', [\App\Http\Controllers\Api\OrdersController::class, 'store']);
     
     });
+
+Route::get('getBrigeFee', [\App\Http\Controllers\Api\BridgeFeeController::class, 'readBrigdeFee']);
 // User Wallet Accounts Routes
 Route::middleware('auth:sanctum')->group(function () {
-Route::get('user-wallet-accounts', [\App\Http\Controllers\Api\UserWalletAccountsController::class, 'index']);
+// Route::get('user-wallet-accounts', [\App\Http\Controllers\Api\UserWalletAccountsController::class, 'index']);
+Route::get('user-wallet-accounts', [\App\Http\Controllers\Api\UserWalletAccountsController::class, 'Userwallets']);
 Route::post('user-wallet-accounts', [\App\Http\Controllers\Api\UserWalletAccountsController::class, 'store']);
 });
+
 // Bridge Fee Routes
 Route::get('bridge-fees', [\App\Http\Controllers\Api\BridgeFeeController::class, 'index']);
 Route::post('bridge-fees', [\App\Http\Controllers\Api\BridgeFeeController::class, 'store']);

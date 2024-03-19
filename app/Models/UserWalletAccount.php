@@ -18,7 +18,7 @@ class UserWalletAccount extends Model
         'Account_Name',
         'User_Profile_Id',
         'Wallet_Id',
-        // 'Status',
+        'Status',
     ];
 
     public function userProfile()

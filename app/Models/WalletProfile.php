@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\UserWalletAccount;
 
 class WalletProfile extends Model
 {
@@ -21,6 +22,21 @@ class WalletProfile extends Model
         'Merchant_Number',
         'Status',
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+    
+        static::updated(function ($walletProfile) {
+            if ($walletProfile->isDirty('Status')) {
+                $walletProfile->userWalletAccounts->each(function ($userWalletAccount) use ($walletProfile) {
+                    $userWalletAccount->update(['Status' => $walletProfile->Status]);
+                });
+            }
+        });
+    }
+    
+
 
     public function userWalletAccounts()
     {

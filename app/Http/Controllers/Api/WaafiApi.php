@@ -229,7 +229,7 @@ class WaafiApi extends Controller
             'Bridge_Fee' => $bridgeFee,
             'Debit_Response' => 'success',
             'Credit_Response' => 'pending',
-            'Status' => 'active',
+            'Status' => 'Pending',
         ]);
 
         // Commit the transaction if everything is successful
