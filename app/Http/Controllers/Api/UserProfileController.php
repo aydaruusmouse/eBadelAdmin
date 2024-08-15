@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Validator;
 // use App\Models\User;
 use App\Models\UserProfile;
 use Laravel\Sanctum\PersonalAccessToken;
+
+
 class UserProfileController extends Controller
 {
     /**
@@ -18,6 +20,7 @@ class UserProfileController extends Controller
      * @return \Illuminate\Http\Response
      */
     // authenticated user info
+    
 
     public function authUser()
 {

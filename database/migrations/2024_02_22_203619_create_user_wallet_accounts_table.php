@@ -14,7 +14,7 @@ class CreateUserWalletAccountsTable extends Migration
             $table->unsignedBigInteger('Wallet_Id')->nullable();
             $table->foreign('User_Profile_Id')->references('User_Profile_Id')->on('user_profiles');
             $table->foreign('Wallet_Id')->references('Wallet_Id')->on('wallets_profiles')->onUpdate('cascade');
-            $table->enum('Status', ['active', 'inactive'])->nullable();
+            $table->enum('Status', ['active', 'inactive'])->default('active')->nullable(false);
             $table->string('Account_Number')->nullable();
             $table->string('Account_Name')->nullable();
             $table->timestamps();
